@@ -31,8 +31,8 @@ write_to = "sympy_reading/_version.py"
 [tool.poe.tasks]
 test = "pytest"
 coverage-xml = "pytest --cov=sympy_reading --doctest-modules --cov-report=xml"
-format = "ruff format sympy_reading"
-check = "ruff check sympy_reading"
+format = "ruff format sympy_reading tests"
+check = "ruff check sympy_reading tests"
 build = [{ cmd = "python -m build" }]
 
 [tool.ruff]
