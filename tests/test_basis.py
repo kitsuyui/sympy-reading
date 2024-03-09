@@ -55,6 +55,11 @@ def test_onbin() -> None:
     tobe = "はっちょう"
     assert result == tobe
 
+    equation = sympy.Number(10**13)
+    result = to_reading(equation)
+    tobe = "じゅっちょう"
+    assert result == tobe
+
     equation = sympy.Number(10**16)
     result = to_reading(equation)
     tobe = "いっけい"
