@@ -24,6 +24,14 @@ def test_to_reading() -> None:
         assert result == tobe
 
 
+def test_nested_expr() -> None:
+    with sympy.evaluate(False):
+        equation = sympy.Eq(sympy.Mul(sympy.Mul(2, 3), 4), 24)
+        result = to_reading(equation)
+        tobe = "に かける さん かける よん いこーる にじゅうよん"
+        assert result == tobe
+
+
 def test_onbin() -> None:
     equation = sympy.Number(8300)
     result = to_reading(equation)
