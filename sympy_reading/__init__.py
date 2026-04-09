@@ -1,10 +1,8 @@
 # TODO: Support more complex expressions
 # TODO: Support other languages
-from typing import Union
 
-from sympy import Eq, Expr
 import sympy
-
+from sympy import Eq, Expr
 
 DIGIT_READING = {
     "0": "ぜろ",
@@ -103,13 +101,9 @@ def scale_onbin_2(reading: str, nth: int) -> str:
 
 
 def scale_reading_1_japanese(digit_str: str, nth: int) -> str:
-    if digit_str == "1":
-        reading = ""
-    else:
-        reading = digit_to_japanese(digit_str)
+    reading = "" if digit_str == "1" else digit_to_japanese(digit_str)
 
-    onbin = scale_onbin_1(reading, nth)
-    return onbin
+    return scale_onbin_1(reading, nth)
 
 
 def digits_to_japanese(digits_str: str, top: bool = True) -> str:
@@ -153,13 +147,13 @@ def component_to_reading(component: Expr) -> str:
     if component.is_integer:
         return digits_to_japanese(str(component))
     raise NotImplementedError(
-        f"Unrecognized expr: {component}, type: {type(component)}"
+        f"Unrecognized expr: {component}, type: {type(component)}",
     )
 
 
 def expr_to_reading(expr: Expr) -> str:
     """
-    Converts a SymPy expression into its Japanese reading, including support for multi-digit numbers.
+    Convert a SymPy expression into its Japanese reading.
     """
 
     # Create the Japanese reading for the expression
@@ -177,18 +171,17 @@ def expr_to_reading(expr: Expr) -> str:
 
 def equation_to_reading(eq: Eq) -> str:
     """
-    Converts a SymPy equation into its Japanese reading, including support for multi-digit numbers.
+    Convert a SymPy equation into its Japanese reading.
     """
     # Extract the left and right sides of the equation
     # Create the Japanese reading for both sides
     left_reading = expr_to_reading(eq.lhs)
     right_reading = expr_to_reading(eq.rhs)
     # Combine both readings with the equals sign
-    full_reading = f"{left_reading} いこーる {right_reading}"
-    return full_reading
+    return f"{left_reading} いこーる {right_reading}"
 
 
-def to_reading(expr: Union[Eq, Expr]) -> str:
+def to_reading(expr: Eq | Expr) -> str:
     if isinstance(expr, Eq):
         return equation_to_reading(expr)
     if isinstance(expr, Expr):
