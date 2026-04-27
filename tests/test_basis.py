@@ -32,6 +32,18 @@ def test_nested_expr() -> None:
         assert result == tobe
 
 
+def test_to_reading_with_three_operands() -> None:
+    with sympy.evaluate(False):
+        equation = sympy.Eq(sympy.Add(1, 2, 3), 6)
+        result = to_reading(equation)
+        assert result == "いち たす に たす さん いこーる ろく"
+
+    with sympy.evaluate(False):
+        equation = sympy.Eq(sympy.Mul(2, 3, 4), 24)
+        result = to_reading(equation)
+        assert result == "に かける さん かける よん いこーる にじゅうよん"
+
+
 def test_onbin() -> None:
     equation = sympy.Number(8300)
     result = to_reading(equation)
