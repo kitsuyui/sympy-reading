@@ -158,10 +158,9 @@ def expr_to_reading(expr: Expr) -> str:
 
     # Create the Japanese reading for the expression
     if expr.args:  # TODO: Currently support only infix notation
-        left = expr_to_reading(expr.args[0])
-        right = expr_to_reading(expr.args[1])
         op = component_to_reading(expr.func)
-        return f"{left} {op} {right}"
+        readings = [expr_to_reading(arg) for arg in expr.args]
+        return f" {op} ".join(readings)
 
     if expr.is_integer:
         return component_to_reading(expr)
