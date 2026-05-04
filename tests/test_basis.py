@@ -1,3 +1,4 @@
+import pytest
 import sympy
 
 from sympy_reading import to_reading
@@ -42,6 +43,30 @@ def test_to_reading_with_three_operands() -> None:
         equation = sympy.Eq(sympy.Mul(2, 3, 4), 24)
         result = to_reading(equation)
         assert result == "に かける さん かける よん いこーる にじゅうよん"
+
+
+def test_supported_expression_scope_without_equation() -> None:
+    assert to_reading(sympy.Integer(0)) == "ぜろ"
+
+    with sympy.evaluate(False):
+        expression = sympy.Add(sympy.Integer(1), sympy.Mul(2, 3))
+        result = to_reading(expression)
+        assert result == "いち たす に かける さん"
+
+
+@pytest.mark.parametrize(
+    "expr",
+    [
+        sympy.Symbol("x"),
+        sympy.Symbol("n", integer=True),
+        sympy.Rational(1, 2),
+        sympy.Integer(-1),
+        sympy.Pow(2, 3, evaluate=False),
+    ],
+)
+def test_unsupported_expression_scope(expr) -> None:
+    with pytest.raises(NotImplementedError, match="Unrecognized expr"):
+        to_reading(expr)
 
 
 def test_onbin() -> None:

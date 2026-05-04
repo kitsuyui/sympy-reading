@@ -144,7 +144,7 @@ def component_to_reading(component: Expr) -> str:
     for op_class, reading in OPERATOR_READING.items():
         if component is op_class:
             return reading
-    if component.is_integer:
+    if component.is_Integer and component >= 0:
         return digits_to_japanese(str(component))
     raise NotImplementedError(
         f"Unrecognized expr: {component}, type: {type(component)}",
