@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   actionlint:
-    uses: kitsuyui/gh-actions-workflows/.github/workflows/actionlint.yml@main
+    uses: kitsuyui/gh-actions-workflows/.github/workflows/actionlint.yml@3717c78af3a5e594b7a81b063276e15fac7e08fc # main
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -23,21 +23,21 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
       - name: Set up Python
         id: setup-python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
         with:
           python-version: "${{ matrix.python }}"
 
       - name: Enable caching
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@d0d8abe699bfb85fec6de9f7adb5ae17292296ff # v6
         with:
           enable-cache: true
 
       - name: Enable caching and setup uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@d0d8abe699bfb85fec6de9f7adb5ae17292296ff # v6
 
       - name: Install dependencies
         run: uv sync
