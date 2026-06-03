@@ -35,13 +35,10 @@ jobs:
         with:
           python-version: "${{ matrix.python }}"
 
-      - name: Enable caching
+      - name: Set up uv
         uses: astral-sh/setup-uv@d0d8abe699bfb85fec6de9f7adb5ae17292296ff # v6
         with:
           enable-cache: true
-
-      - name: Enable caching and setup uv
-        uses: astral-sh/setup-uv@d0d8abe699bfb85fec6de9f7adb5ae17292296ff # v6
 
       - name: Install dependencies
         run: uv sync
