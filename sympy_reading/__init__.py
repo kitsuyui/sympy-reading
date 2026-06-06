@@ -123,7 +123,7 @@ def digits_to_japanese(digits_str: str, top: bool = True) -> str:
         return f"{reading}{digits_to_japanese(digits_str[1:], top=False)}"
 
     # Split the digits into groups of 4 from right to left
-    digits_array = []
+    digits_array: list[str] = []
     for i in range(0, len(digits_str), 4):
         cut = digits_str[-(i + 4) : len(digits_str) - i]
         if cut:
