@@ -1,29 +1,35 @@
 # TODO: Support more complex expressions
 # TODO: Support other languages
 
+from types import MappingProxyType
+
 import sympy
 from sympy import Add, Eq, Expr, Integer, Mul
 
-DIGIT_READING = {
-    "0": "ぜろ",
-    "1": "いち",
-    "2": "に",
-    "3": "さん",
-    "4": "よん",
-    "5": "ご",
-    "6": "ろく",
-    "7": "なな",
-    "8": "はち",
-    "9": "きゅう",
-}
+__all__ = ["to_reading"]
 
-SCALE_READING_1 = [
+DIGIT_READING = MappingProxyType(
+    {
+        "0": "ぜろ",
+        "1": "いち",
+        "2": "に",
+        "3": "さん",
+        "4": "よん",
+        "5": "ご",
+        "6": "ろく",
+        "7": "なな",
+        "8": "はち",
+        "9": "きゅう",
+    },
+)
+
+SCALE_READING_1 = (
     "じゅう",
     "ひゃく",
     "せん",
-]
+)
 
-SCALE_READING_2 = [
+SCALE_READING_2 = (
     "",
     "まん",
     "おく",
@@ -42,12 +48,14 @@ SCALE_READING_2 = [
     "なゆた",
     "ふかしぎ",
     "むりょうたいすう",
-]
+)
 
-OPERATOR_READING = {
-    sympy.core.add.Add: "たす",
-    sympy.core.mul.Mul: "かける",
-}
+OPERATOR_READING = MappingProxyType(
+    {
+        sympy.core.add.Add: "たす",
+        sympy.core.mul.Mul: "かける",
+    },
+)
 
 
 def digit_to_japanese(digit_str: str) -> str:
