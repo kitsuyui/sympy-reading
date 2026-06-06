@@ -62,6 +62,7 @@ def test_supported_expression_scope_without_equation() -> None:
         sympy.Rational(1, 2),
         sympy.Integer(-1),
         sympy.Pow(2, 3, evaluate=False),
+        sympy.Float(3.0),  # is_integer=True but is_Integer=False
     ],
 )
 def test_unsupported_expression_scope(expr) -> None:

@@ -162,7 +162,7 @@ def expr_to_reading(expr: Expr) -> str:
         readings = [expr_to_reading(arg) for arg in expr.args]
         return f" {op} ".join(readings)
 
-    if expr.is_integer:
+    if expr.is_Integer:
         return component_to_reading(expr)
 
     raise NotImplementedError(f"Unrecognized expr: {expr}, type: {type(expr)}")
