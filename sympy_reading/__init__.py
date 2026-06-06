@@ -1,11 +1,19 @@
 # TODO: Support more complex expressions
 # TODO: Support other languages
 
+import warnings
 from types import MappingProxyType
 
 from sympy import Add, Eq, Expr, Integer, Mul
+from sympy.core.parameters import global_parameters
+from sympy.logic.boolalg import BooleanAtom
 
 __all__ = ["to_reading"]
+
+
+class ExpressionEvaluationWarning(UserWarning):
+    """Warns that SymPy may have evaluated an input before reading it."""
+
 
 DIGIT_READING = MappingProxyType(
     {
@@ -210,16 +218,48 @@ def equation_to_reading(eq: Eq) -> str:
     return f"{left_reading} いこーる {right_reading}"
 
 
-def to_reading(expr: Add | Eq | Integer | Mul) -> str:
+def warn_if_scalar_may_be_evaluated(expr: Expr) -> None:
+    if not expr.is_Integer:
+        return
+    if expr < 0:
+        return
+    if not global_parameters.evaluate:
+        return
+    warnings.warn(
+        "to_reading() received an integer while SymPy evaluation is enabled. "
+        "If this value came from an expression such as sympy.Add(1, 2), "
+        "SymPy may have evaluated it before to_reading() could read the "
+        "operator structure. Use sympy.evaluate(False) or evaluate=False to "
+        "preserve numeric operators.",
+        ExpressionEvaluationWarning,
+        stacklevel=2,
+    )
+
+
+def raise_evaluated_boolean_error(expr: BooleanAtom) -> None:
+    raise NotImplementedError(
+        f"Unrecognized evaluated boolean: {expr}. "
+        "SymPy may have evaluated an equation before to_reading() could read "
+        "its left and right sides. Use sympy.evaluate(False) or "
+        "sympy.Eq(..., evaluate=False) to preserve the equation structure.",
+    )
+
+
+def to_reading(expr: Add | BooleanAtom | Eq | Integer | Mul) -> str:
     """
     Convert the supported SymPy subset into a Japanese reading.
 
     Supported inputs are non-negative integers, Add/Mul expressions whose
     operands are supported, and Eq equations whose sides are supported.
-    Unsupported expressions raise NotImplementedError.
+    An evaluated boolean (e.g. ``Eq(1, 1)`` under SymPy evaluation) raises
+    NotImplementedError with guidance to disable evaluation. Other
+    unsupported expressions also raise NotImplementedError.
     """
     if isinstance(expr, Eq):
         return equation_to_reading(expr)
+    if isinstance(expr, BooleanAtom):
+        raise_evaluated_boolean_error(expr)
     if isinstance(expr, Expr):
+        warn_if_scalar_may_be_evaluated(expr)
         return expr_to_reading(expr)
     raise NotImplementedError(f"Unrecognized expr: {expr}, type: {type(expr)}")

@@ -2,9 +2,10 @@ from typing import get_args, get_type_hints
 
 import pytest
 import sympy
+from sympy.logic.boolalg import BooleanAtom
 
 import sympy_reading
-from sympy_reading import to_reading
+from sympy_reading import ExpressionEvaluationWarning, to_reading
 
 
 def test_to_reading() -> None:
@@ -49,7 +50,8 @@ def test_to_reading_with_three_operands() -> None:
 
 
 def test_supported_expression_scope_without_equation() -> None:
-    assert to_reading(sympy.Integer(0)) == "ぜろ"
+    with sympy.evaluate(False):
+        assert to_reading(sympy.Integer(0)) == "ぜろ"
 
     with sympy.evaluate(False):
         expression = sympy.Add(sympy.Integer(1), sympy.Mul(2, 3))
@@ -72,6 +74,7 @@ def test_to_reading_type_hint_matches_supported_root_scope() -> None:
 
     assert accepted_types == {
         sympy.Add,
+        BooleanAtom,
         sympy.Eq,
         sympy.Integer,
         sympy.Mul,
@@ -90,6 +93,18 @@ def test_public_exports_and_internal_tables_are_stable() -> None:
         sympy_reading.SCALE_READING_2.append("extra")  # type: ignore[attr-defined]
     with pytest.raises(TypeError):
         sympy_reading.OPERATOR_READING[sympy.Add] = "plus"  # type: ignore[index]
+
+
+def test_evaluated_scalar_warns_about_lost_structure() -> None:
+    with pytest.warns(ExpressionEvaluationWarning, match="evaluated"):
+        result = to_reading(sympy.Add(1, 2))
+
+    assert result == "さん"
+
+
+def test_evaluated_equation_error_mentions_evaluate_false() -> None:
+    with pytest.raises(NotImplementedError, match="evaluated boolean"):
+        to_reading(sympy.Eq(1, 1))
 
 
 @pytest.mark.parametrize(
@@ -119,55 +134,56 @@ def test_large_number_raises_not_implemented() -> None:
 
 
 def test_onbin() -> None:
-    equation = sympy.Number(8300)
-    result = to_reading(equation)
-    tobe = "はっせんさんびゃく"
-    assert result == tobe
+    with sympy.evaluate(False):
+        equation = sympy.Number(8300)
+        result = to_reading(equation)
+        tobe = "はっせんさんびゃく"
+        assert result == tobe
 
-    equation = sympy.Number(3800)
-    result = to_reading(equation)
-    tobe = "さんぜんはっぴゃく"
-    assert result == tobe
+        equation = sympy.Number(3800)
+        result = to_reading(equation)
+        tobe = "さんぜんはっぴゃく"
+        assert result == tobe
 
-    equation = sympy.Number(3600)
-    result = to_reading(equation)
-    tobe = "さんぜんろっぴゃく"
-    assert result == tobe
+        equation = sympy.Number(3600)
+        result = to_reading(equation)
+        tobe = "さんぜんろっぴゃく"
+        assert result == tobe
 
-    equation = sympy.Number(10**12)
-    result = to_reading(equation)
-    tobe = "いっちょう"
-    assert result == tobe
+        equation = sympy.Number(10**12)
+        result = to_reading(equation)
+        tobe = "いっちょう"
+        assert result == tobe
 
-    equation = sympy.Number(6 * 10**12)
-    result = to_reading(equation)
-    tobe = "ろくちょう"
-    assert result == tobe
+        equation = sympy.Number(6 * 10**12)
+        result = to_reading(equation)
+        tobe = "ろくちょう"
+        assert result == tobe
 
-    equation = sympy.Number(8 * 10**12)
-    result = to_reading(equation)
-    tobe = "はっちょう"
-    assert result == tobe
+        equation = sympy.Number(8 * 10**12)
+        result = to_reading(equation)
+        tobe = "はっちょう"
+        assert result == tobe
 
-    equation = sympy.Number(10**13)
-    result = to_reading(equation)
-    tobe = "じゅっちょう"
-    assert result == tobe
+        equation = sympy.Number(10**13)
+        result = to_reading(equation)
+        tobe = "じゅっちょう"
+        assert result == tobe
 
-    equation = sympy.Number(10**16)
-    result = to_reading(equation)
-    tobe = "いっけい"
-    assert result == tobe
+        equation = sympy.Number(10**16)
+        result = to_reading(equation)
+        tobe = "いっけい"
+        assert result == tobe
 
-    equation = sympy.Number(6 * 10**16)
-    result = to_reading(equation)
-    tobe = "ろっけい"
-    assert result == tobe
+        equation = sympy.Number(6 * 10**16)
+        result = to_reading(equation)
+        tobe = "ろっけい"
+        assert result == tobe
 
-    equation = sympy.Number(8 * 10**16)
-    result = to_reading(equation)
-    tobe = "はっけい"
-    assert result == tobe
+        equation = sympy.Number(8 * 10**16)
+        result = to_reading(equation)
+        tobe = "はっけい"
+        assert result == tobe
 
     equation = sympy.Number(10**17)
     result = to_reading(equation)
