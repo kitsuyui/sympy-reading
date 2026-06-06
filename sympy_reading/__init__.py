@@ -154,12 +154,18 @@ def component_to_reading(component: Expr) -> str:
 def expr_to_reading(expr: Expr) -> str:
     """
     Convert a SymPy expression into its Japanese reading.
+
+    For commutative operations (Add, Mul), arguments are sorted by their
+    string representation to produce a stable, version-independent output
+    order that does not depend on SymPy's internal canonical ordering.
     """
 
     # Create the Japanese reading for the expression
     if expr.args:  # TODO: Currently support only infix notation
         op = component_to_reading(expr.func)
-        readings = [expr_to_reading(arg) for arg in expr.args]
+        # Sort by str() for stable output independent of SymPy version.
+        sorted_args = sorted(expr.args, key=str)
+        readings = [expr_to_reading(arg) for arg in sorted_args]
         return f" {op} ".join(readings)
 
     if expr.is_integer:
