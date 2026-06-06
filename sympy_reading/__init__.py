@@ -122,6 +122,14 @@ def digits_to_japanese(digits_str: str, top: bool = True) -> str:
         reading = scale_reading_1_japanese(digits_str[0], len(digits_str) - 2)
         return f"{reading}{digits_to_japanese(digits_str[1:], top=False)}"
 
+    if len(digits_str) > len(SCALE_READING_2) * 4:
+        raise NotImplementedError(
+            f"digits_to_japanese supports integers up to "
+            f"{len(SCALE_READING_2) * 4} digits "
+            f"(< 10^{len(SCALE_READING_2) * 4}); "
+            f"got {len(digits_str)} digits.",
+        )
+
     # Split the digits into groups of 4 from right to left
     digits_array = []
     for i in range(0, len(digits_str), 4):
