@@ -1,6 +1,9 @@
+from typing import get_args, get_type_hints
+
 import pytest
 import sympy
 
+import sympy_reading
 from sympy_reading import to_reading
 
 
@@ -52,6 +55,19 @@ def test_supported_expression_scope_without_equation() -> None:
         expression = sympy.Add(sympy.Integer(1), sympy.Mul(2, 3))
         result = to_reading(expression)
         assert result == "いち たす に かける さん"
+
+
+def test_to_reading_type_hint_matches_supported_root_scope() -> None:
+    hints = get_type_hints(sympy_reading.to_reading)
+    accepted_types = set(get_args(hints["expr"]))
+
+    assert accepted_types == {
+        sympy.Add,
+        sympy.Eq,
+        sympy.Integer,
+        sympy.Mul,
+    }
+    assert sympy.Expr not in accepted_types
 
 
 @pytest.mark.parametrize(
