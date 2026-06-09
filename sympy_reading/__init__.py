@@ -1,7 +1,7 @@
 # TODO: Support more complex expressions
 # TODO: Support other languages
 
-from sympy import Add, Eq, Expr, Mul
+from sympy import Add, Eq, Expr, Integer, Mul
 
 DIGIT_READING = {
     "0": "ぜろ",
@@ -122,7 +122,7 @@ def digits_to_japanese(digits_str: str, top: bool = True) -> str:
         return f"{reading}{digits_to_japanese(digits_str[1:], top=False)}"
 
     # Split the digits into groups of 4 from right to left
-    digits_array = []
+    digits_array: list[str] = []
     for i in range(0, len(digits_str), 4):
         cut = digits_str[-(i + 4) : len(digits_str) - i]
         if cut:
@@ -138,8 +138,13 @@ def digits_to_japanese(digits_str: str, top: bool = True) -> str:
     return "".join(readings)
 
 
-# Convert equation components to their Japanese readings
-def component_to_reading(component: Expr) -> str:
+def component_to_reading(component: Integer | type[Add] | type[Mul]) -> str:
+    """
+    Convert a supported leaf component or operator class.
+
+    Supported components are non-negative integers and the Add/Mul operator
+    classes used while recursively reading supported expressions.
+    """
     for op_class, reading in OPERATOR_READING.items():
         if component is op_class:
             return reading
@@ -150,9 +155,13 @@ def component_to_reading(component: Expr) -> str:
     )
 
 
-def expr_to_reading(expr: Expr) -> str:
+def expr_to_reading(expr: Add | Integer | Mul) -> str:
     """
-    Convert a SymPy expression into its Japanese reading.
+    Convert a supported SymPy expression into its Japanese reading.
+
+    Supported expressions are non-negative integers and Add/Mul expressions
+    whose operands are also supported. Other SymPy expressions raise
+    NotImplementedError.
     """
 
     # Create the Japanese reading for the expression
@@ -179,7 +188,14 @@ def equation_to_reading(eq: Eq) -> str:
     return f"{left_reading} いこーる {right_reading}"
 
 
-def to_reading(expr: Eq | Expr) -> str:
+def to_reading(expr: Add | Eq | Integer | Mul) -> str:
+    """
+    Convert the supported SymPy subset into a Japanese reading.
+
+    Supported inputs are non-negative integers, Add/Mul expressions whose
+    operands are supported, and Eq equations whose sides are supported.
+    Unsupported expressions raise NotImplementedError.
+    """
     if isinstance(expr, Eq):
         return equation_to_reading(expr)
     if isinstance(expr, Expr):
