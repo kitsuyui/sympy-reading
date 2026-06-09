@@ -18,7 +18,7 @@ permissions:
   contents: read
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -35,16 +35,56 @@ jobs:
       - name: Build
         run: uv build
 
+  publish-test-pypi:
+    name: Publish distribution to Test PyPI
+    if: github.event_name == 'release' && github.event.release.prerelease
+    needs: build
+    runs-on: ubuntu-latest
+    environment: test-pypi
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+
+      - name: Enable caching
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
+        with:
+          enable-cache: true
+
+      - run: |
+          uv python pin ${{ env.python_version }}
+          uv sync
+
+      - name: Build
+        run: uv build
+
       - name: Publish distribution to Test PyPI
         uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b
-        if: github.event_name == 'release' && github.event.release.prerelease
         with:
           user: __token__
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
           repository-url: https://test.pypi.org/legacy/
 
+  publish-pypi:
+    name: Publish distribution to PyPI
+    if: github.event_name == 'release' && !github.event.release.prerelease
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+
+      - name: Enable caching
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
+        with:
+          enable-cache: true
+
+      - run: |
+          uv python pin ${{ env.python_version }}
+          uv sync
+
+      - name: Build
+        run: uv build
+
       - name: Publish distribution to PyPI
-        if: github.event_name == 'release' && !github.event.release.prerelease
         uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b
         with:
           user: __token__
