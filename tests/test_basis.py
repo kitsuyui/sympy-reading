@@ -57,6 +57,15 @@ def test_supported_expression_scope_without_equation() -> None:
         assert result == "いち たす に かける さん"
 
 
+def test_integer_compound_dispatches_as_compound() -> None:
+    # Add(1, 2) with evaluate=False satisfies both expr.args (non-empty) and
+    # expr.is_integer (True). The args branch must be checked first so the
+    # expression is rendered as infix, not passed to component_to_reading.
+    with sympy.evaluate(False):
+        assert to_reading(sympy.Add(1, 2)) == "いち たす に"
+        assert to_reading(sympy.Mul(3, 4)) == "さん かける よん"
+
+
 def test_to_reading_type_hint_matches_supported_root_scope() -> None:
     hints = get_type_hints(sympy_reading.to_reading)
     accepted_types = set(get_args(hints["expr"]))
@@ -91,11 +100,22 @@ def test_public_exports_and_internal_tables_are_stable() -> None:
         sympy.Rational(1, 2),
         sympy.Integer(-1),
         sympy.Pow(2, 3, evaluate=False),
+        sympy.Float(3.0),  # is_integer=True but is_Integer=False
     ],
 )
 def test_unsupported_expression_scope(expr) -> None:
     with pytest.raises(NotImplementedError, match="Unrecognized expr"):
         to_reading(expr)
+
+
+def test_large_number_raises_not_implemented() -> None:
+    # 10^72 has 73 digits, exceeding the 72-digit (18 groups x 4) limit.
+    with pytest.raises(NotImplementedError):
+        to_reading(sympy.Integer(10**72))
+
+    # 10^72 - 1 is the maximum supported (72 digits = むりょうたいすう scale).
+    result = to_reading(sympy.Integer(10**68))
+    assert result == "いちむりょうたいすう"
 
 
 def test_onbin() -> None:
@@ -153,3 +173,11 @@ def test_onbin() -> None:
     result = to_reading(equation)
     tobe = "じゅっけい"
     assert result == tobe
+
+
+def test_args_order_is_stable() -> None:
+    # expr_to_reading sorts args by str() so output is independent of
+    # SymPy's internal canonical ordering of Add/Mul arguments.
+    with sympy.evaluate(False):
+        assert to_reading(sympy.Add(11, 22)) == to_reading(sympy.Add(22, 11))
+        assert to_reading(sympy.Mul(2, 3)) == to_reading(sympy.Mul(3, 2))

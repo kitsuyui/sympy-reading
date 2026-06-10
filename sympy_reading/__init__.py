@@ -3,7 +3,6 @@
 
 from types import MappingProxyType
 
-import sympy
 from sympy import Add, Eq, Expr, Integer, Mul
 
 __all__ = ["to_reading"]
@@ -52,8 +51,8 @@ SCALE_READING_2 = (
 
 OPERATOR_READING = MappingProxyType(
     {
-        sympy.core.add.Add: "たす",
-        sympy.core.mul.Mul: "かける",
+        Add: "たす",
+        Mul: "かける",
     },
 )
 
@@ -130,6 +129,14 @@ def digits_to_japanese(digits_str: str, top: bool = True) -> str:
         reading = scale_reading_1_japanese(digits_str[0], len(digits_str) - 2)
         return f"{reading}{digits_to_japanese(digits_str[1:], top=False)}"
 
+    if len(digits_str) > len(SCALE_READING_2) * 4:
+        raise NotImplementedError(
+            f"digits_to_japanese supports integers up to "
+            f"{len(SCALE_READING_2) * 4} digits "
+            f"(< 10^{len(SCALE_READING_2) * 4}); "
+            f"got {len(digits_str)} digits.",
+        )
+
     # Split the digits into groups of 4 from right to left
     digits_array: list[str] = []
     for i in range(0, len(digits_str), 4):
@@ -171,15 +178,21 @@ def expr_to_reading(expr: Add | Integer | Mul) -> str:
     Supported expressions are non-negative integers and Add/Mul expressions
     whose operands are also supported. Other SymPy expressions raise
     NotImplementedError.
+
+    For commutative operations (Add, Mul), arguments are sorted by their
+    string representation to produce a stable, version-independent output
+    order that does not depend on SymPy's internal canonical ordering.
     """
 
     # Create the Japanese reading for the expression
     if expr.args:  # TODO: Currently support only infix notation
         op = component_to_reading(expr.func)
-        readings = [expr_to_reading(arg) for arg in expr.args]
+        # Sort by str() for stable output independent of SymPy version.
+        sorted_args = sorted(expr.args, key=str)
+        readings = [expr_to_reading(arg) for arg in sorted_args]
         return f" {op} ".join(readings)
 
-    if expr.is_integer:
+    if expr.is_Integer:
         return component_to_reading(expr)
 
     raise NotImplementedError(f"Unrecognized expr: {expr}, type: {type(expr)}")
