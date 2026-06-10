@@ -4,6 +4,40 @@
 
 Convert a small subset of SymPy expressions into Japanese readings.
 
+## Installation
+
+```sh
+pip install sympy-reading
+```
+
+## Usage
+
+```python
+import sympy
+from sympy_reading import to_reading
+
+# Single integer
+print(to_reading(sympy.Integer(3)))
+# => さん
+
+# Equation: wrap in sympy.evaluate(False) to preserve the unevaluated form
+with sympy.evaluate(False):
+    eq = sympy.Eq(sympy.Add(11, 22), 33)
+    print(to_reading(eq))
+    # => じゅういち たす にじゅうに いこーる さんじゅうさん
+
+# Multiplication
+with sympy.evaluate(False):
+    eq = sympy.Eq(sympy.Mul(2, 3, 4), 24)
+    print(to_reading(eq))
+    # => に かける さん かける よん いこーる にじゅうよん
+```
+
+> **Note:** Always wrap `Add` and `Mul` expressions in `sympy.evaluate(False)`
+> (or pass `evaluate=False` to the constructor). Without it, SymPy evaluates
+> the expression before `to_reading()` can inspect the operator, so the
+> structure is lost.
+
 ## Supported expression scope
 
 This package currently supports a narrow, explicit subset:
@@ -16,10 +50,6 @@ This package currently supports a narrow, explicit subset:
 
 `Add` is read as infix `たす`, `Mul` is read as infix `かける`, and `Eq` is
 read as `いこーる`.
-
-Use `sympy.evaluate(False)` or `evaluate=False` when an example must preserve
-numeric operators. Otherwise, SymPy may evaluate expressions such as
-`sympy.Add(1, 2)` before `to_reading()` sees the `Add` operation.
 
 Unsupported expressions raise `NotImplementedError`, including symbols,
 negative integers, rationals, floats, functions, powers, inequalities, and
