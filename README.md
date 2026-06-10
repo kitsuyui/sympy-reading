@@ -25,6 +25,12 @@ Unsupported expressions raise `NotImplementedError`, including symbols,
 negative integers, rationals, floats, functions, powers, inequalities, and
 operators other than `Add` and `Mul`.
 
+## Version Status
+
+This package is currently classified as `Development Status :: 3 - Alpha`.
+The API may change without notice.
+A stable release will be tagged when the supported expression scope stabilizes and breaking changes become unlikely.
+
 ## Development
 
 This repository uses [lefthook](https://lefthook.dev/) to run the same checks as CI
