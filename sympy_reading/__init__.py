@@ -171,12 +171,18 @@ def expr_to_reading(expr: Add | Integer | Mul) -> str:
     Supported expressions are non-negative integers and Add/Mul expressions
     whose operands are also supported. Other SymPy expressions raise
     NotImplementedError.
+
+    For commutative operations (Add, Mul), arguments are sorted by their
+    string representation to produce a stable, version-independent output
+    order that does not depend on SymPy's internal canonical ordering.
     """
 
     # Create the Japanese reading for the expression
     if expr.args:  # TODO: Currently support only infix notation
         op = component_to_reading(expr.func)
-        readings = [expr_to_reading(arg) for arg in expr.args]
+        # Sort by str() for stable output independent of SymPy version.
+        sorted_args = sorted(expr.args, key=str)
+        readings = [expr_to_reading(arg) for arg in sorted_args]
         return f" {op} ".join(readings)
 
     if expr.is_integer:

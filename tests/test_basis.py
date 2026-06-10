@@ -150,3 +150,11 @@ def test_onbin() -> None:
     result = to_reading(equation)
     tobe = "じゅっけい"
     assert result == tobe
+
+
+def test_args_order_is_stable() -> None:
+    # expr_to_reading sorts args by str() so output is independent of
+    # SymPy's internal canonical ordering of Add/Mul arguments.
+    with sympy.evaluate(False):
+        assert to_reading(sympy.Add(11, 22)) == to_reading(sympy.Add(22, 11))
+        assert to_reading(sympy.Mul(2, 3)) == to_reading(sympy.Mul(3, 2))
