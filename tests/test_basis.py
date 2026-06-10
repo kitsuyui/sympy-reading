@@ -85,6 +85,16 @@ def test_unsupported_expression_scope(expr) -> None:
         to_reading(expr)
 
 
+def test_large_number_raises_not_implemented() -> None:
+    # 10^72 has 73 digits, exceeding the 72-digit (18 groups x 4) limit.
+    with pytest.raises(NotImplementedError):
+        to_reading(sympy.Integer(10**72))
+
+    # 10^72 - 1 is the maximum supported (72 digits = むりょうたいすう scale).
+    result = to_reading(sympy.Integer(10**68))
+    assert result == "いちむりょうたいすう"
+
+
 def test_onbin() -> None:
     equation = sympy.Number(8300)
     result = to_reading(equation)
