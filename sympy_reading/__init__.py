@@ -1,7 +1,6 @@
 # TODO: Support more complex expressions
 # TODO: Support other languages
 
-import sympy
 from sympy import Add, Eq, Expr, Integer, Mul
 
 DIGIT_READING = {
@@ -45,8 +44,8 @@ SCALE_READING_2 = [
 ]
 
 OPERATOR_READING = {
-    sympy.core.add.Add: "たす",
-    sympy.core.mul.Mul: "かける",
+    Add: "たす",
+    Mul: "かける",
 }
 
 
