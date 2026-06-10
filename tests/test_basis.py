@@ -83,13 +83,13 @@ def test_public_exports_and_internal_tables_are_stable() -> None:
     assert sympy_reading.__all__ == ["to_reading"]
 
     with pytest.raises(TypeError):
-        sympy_reading.DIGIT_READING["1"] = "one"
+        sympy_reading.DIGIT_READING["1"] = "one"  # type: ignore[index]
     with pytest.raises(AttributeError):
-        sympy_reading.SCALE_READING_1.append("extra")
+        sympy_reading.SCALE_READING_1.append("extra")  # type: ignore[attr-defined]
     with pytest.raises(AttributeError):
-        sympy_reading.SCALE_READING_2.append("extra")
+        sympy_reading.SCALE_READING_2.append("extra")  # type: ignore[attr-defined]
     with pytest.raises(TypeError):
-        sympy_reading.OPERATOR_READING[sympy.Add] = "plus"
+        sympy_reading.OPERATOR_READING[sympy.Add] = "plus"  # type: ignore[index]
 
 
 @pytest.mark.parametrize(
