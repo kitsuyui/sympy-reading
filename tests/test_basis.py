@@ -57,6 +57,15 @@ def test_supported_expression_scope_without_equation() -> None:
         assert result == "いち たす に かける さん"
 
 
+def test_integer_compound_dispatches_as_compound() -> None:
+    # Add(1, 2) with evaluate=False satisfies both expr.args (non-empty) and
+    # expr.is_integer (True). The args branch must be checked first so the
+    # expression is rendered as infix, not passed to component_to_reading.
+    with sympy.evaluate(False):
+        assert to_reading(sympy.Add(1, 2)) == "いち たす に"
+        assert to_reading(sympy.Mul(3, 4)) == "さん かける よん"
+
+
 def test_to_reading_type_hint_matches_supported_root_scope() -> None:
     hints = get_type_hints(sympy_reading.to_reading)
     accepted_types = set(get_args(hints["expr"]))
