@@ -1,6 +1,22 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "local>kitsuyui/renovate-config"
+    "config:recommended",
+    ":dependencyDashboard",
+    "default:pinDigestsDisabled",
+    "local>kitsuyui/renovate-config:npm.json5#cdad3c71e34e5abadf909c996906011bbc2b5725",
+    "local>kitsuyui/renovate-config:python.json5#cdad3c71e34e5abadf909c996906011bbc2b5725",
+    "local>kitsuyui/renovate-config:cargo.json5#cdad3c71e34e5abadf909c996906011bbc2b5725",
+    "local>kitsuyui/renovate-config:gha.json5#cdad3c71e34e5abadf909c996906011bbc2b5725",
+    "local>kitsuyui/renovate-config:pin.json5#cdad3c71e34e5abadf909c996906011bbc2b5725",
+    "local>kitsuyui/renovate-config:lockfile.json5#cdad3c71e34e5abadf909c996906011bbc2b5725"
+  ],
+  "git-submodules": {
+    "enabled": true
+  },
+  "timezone": "Asia/Tokyo",
+  "schedule": [
+    "before 9am every weekday",
+    "every weekend"
   ]
 }
