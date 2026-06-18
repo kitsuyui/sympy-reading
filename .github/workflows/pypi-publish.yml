@@ -22,6 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
 
       - name: Enable caching
         uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
@@ -46,6 +48,8 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          persist-credentials: false
 
       - name: Enable caching
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
@@ -75,6 +79,8 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          persist-credentials: false
 
       - name: Enable caching
         uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
