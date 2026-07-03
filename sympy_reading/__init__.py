@@ -65,10 +65,7 @@ OPERATOR_READING = MappingProxyType(
 )
 
 
-def digit_to_japanese(digit_str: str) -> str:
-    """
-    Converts a digit string to its Japanese reading.
-    """
+def _digit_to_japanese(digit_str: str) -> str:
     return DIGIT_READING[digit_str]
 
 
@@ -115,31 +112,27 @@ def scale_onbin_2(reading: str, nth: int) -> str:
     return f"{reading}{scale}"
 
 
-def scale_reading_1_japanese(digit_str: str, nth: int) -> str:
-    reading = "" if digit_str == "1" else digit_to_japanese(digit_str)
+def _scale_reading_1_japanese(digit_str: str, nth: int) -> str:
+    reading = "" if digit_str == "1" else _digit_to_japanese(digit_str)
 
     return scale_onbin_1(reading, nth)
 
 
-def digits_to_japanese(digits_str: str, top: bool = True) -> str:
-    """
-    Converts a digit string to its Japanese reading.
-    """
-
+def _digits_to_japanese(digits_str: str, top: bool = True) -> str:
     if len(digits_str) == 1:
         if not top and digits_str[0] == "0":
             return ""
-        return digit_to_japanese(digits_str)
+        return _digit_to_japanese(digits_str)
 
     if len(digits_str) <= 4:
         if digits_str[0] == "0":
-            return digits_to_japanese(digits_str[1:], top=False)
-        reading = scale_reading_1_japanese(digits_str[0], len(digits_str) - 2)
-        return f"{reading}{digits_to_japanese(digits_str[1:], top=False)}"
+            return _digits_to_japanese(digits_str[1:], top=False)
+        reading = _scale_reading_1_japanese(digits_str[0], len(digits_str) - 2)
+        return f"{reading}{_digits_to_japanese(digits_str[1:], top=False)}"
 
     if len(digits_str) > len(SCALE_READING_2) * 4:
         raise NotImplementedError(
-            f"digits_to_japanese supports integers up to "
+            f"to_reading supports integers up to "
             f"{len(SCALE_READING_2) * 4} digits "
             f"(< 10^{len(SCALE_READING_2) * 4}); "
             f"got {len(digits_str)} digits.",
@@ -155,7 +148,7 @@ def digits_to_japanese(digits_str: str, top: bool = True) -> str:
     readings = []
     for i, digits in enumerate(digits_array):
         nth = len(digits_array) - i - 1
-        base = digits_to_japanese(digits, top=False)
+        base = _digits_to_japanese(digits, top=False)
         reading = scale_onbin_2(base, nth)
         readings.append(reading)
 
@@ -173,7 +166,7 @@ def component_to_reading(component: Integer | type[Add] | type[Mul]) -> str:
         if component is op_class:
             return reading
     if component.is_Integer and component >= 0:
-        return digits_to_japanese(str(component))
+        return _digits_to_japanese(str(component))
     raise NotImplementedError(
         f"Unrecognized expr: {component}, type: {type(component)}",
     )
