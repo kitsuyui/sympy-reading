@@ -38,6 +38,7 @@ dev = [
     "setuptools-scm",
     "ruff",
     "mypy",
+    "setuptools>=84.1.0",
 ]
 
 [tool.uv]
